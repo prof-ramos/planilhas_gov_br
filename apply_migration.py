@@ -1,4 +1,6 @@
 import os
+import sys
+from pathlib import Path
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import logging
@@ -10,9 +12,13 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def apply_migration():
+def apply_migration(migration_file=None):
     """
-    Apply the migration SQL to create the government_data table
+    Apply migration SQL file(s) to the database
+
+    Args:
+        migration_file: Specific migration file to apply (optional)
+                       If None, applies all migrations in order
     """
     # Initialize Supabase client
     url = os.environ.get("SUPABASE_URL")
@@ -20,15 +26,30 @@ def apply_migration():
 
     if not url or not key:
         logger.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY")
-        return
+        return False
 
-    supabase: Client = create_client(url, key)
+    # Get migration files
+    migrations_dir = Path('migrations')
+    if migration_file:
+        migration_files = [migrations_dir / migration_file]
+    else:
+        # Get all .sql files sorted by name
+        migration_files = sorted(migrations_dir.glob('*.sql'))
 
-    # Read migration SQL
-    with open('migrations/001_create_government_data_table.sql', 'r') as f:
-        migration_sql = f.read()
+    if not migration_files:
+        logger.error(f"No migration files found in {migrations_dir}")
+        return False
 
-    logger.info("Applying migration to create government_data table...")
+    # Read and combine migration SQL
+    migration_sql = ""
+    for mig_file in migration_files:
+        logger.info(f"Reading migration: {mig_file.name}")
+        with open(mig_file, 'r') as f:
+            migration_sql += f"\n-- File: {mig_file.name}\n"
+            migration_sql += f.read()
+            migration_sql += "\n"
+
+    logger.info(f"Applying {len(migration_files)} migration(s)...")
 
     try:
         # Execute the migration SQL using the PostgREST SQL endpoint

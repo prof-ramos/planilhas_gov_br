@@ -143,7 +143,7 @@ def upload_government_data_to_supabase():
                         record[key] = None
 
             try:
-                response = supabase.table('government_data').insert(batch).execute()
+                response = supabase.table('autorizacoes_uniao').insert(batch).execute()
                 total_uploaded += len(batch)
                 logger.info(f"✓ Uploaded batch {i//batch_size + 1}: rows {i} to {i+len(batch)} (total: {total_uploaded})")
             except Exception as batch_error:

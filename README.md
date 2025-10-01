@@ -61,7 +61,7 @@ uv run apply_migration.py
 ```bash
 uv run upload_to_supabase_normalized.py
 ```
-Envia todos os registros em lotes de 1000 para a tabela `government_data`.
+Envia todos os registros em lotes de 1000 para a tabela `autorizacoes_uniao`.
 
 ## Dados de Saída
 

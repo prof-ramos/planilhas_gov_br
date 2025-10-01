@@ -97,7 +97,7 @@ This normalization is critical because government spreadsheets have inconsistent
 
 ## Database Schema
 
-The `government_data` table stores normalized public competition data with the following structure:
+A tabela `autorizacoes_uniao` armazena dados normalizados de concursos públicos federais com a seguinte estrutura:
 
 ### Core Fields (from Dicionário de Dados)
 
@@ -174,5 +174,8 @@ This backend supports a comprehensive dashboard for analyzing Brazilian public c
   - Data type conversion (float vagas → integer)
   - NaN/inf value handling for JSON compatibility
   - Batch uploads (1000 records/batch) for performance
-- Supabase table names: `government_data` (normalized), `government_data_json` (legacy)
+- Supabase table name: `autorizacoes_uniao` (dados normalizados de autorizações e provimentos)
+- **Segurança RLS habilitada**:
+  - Leitura pública (dados são públicos do DOU)
+  - Escrita restrita ao service_role (apenas backend ETL)
 - The project uses uv for dependency management (pyproject.toml exists)
