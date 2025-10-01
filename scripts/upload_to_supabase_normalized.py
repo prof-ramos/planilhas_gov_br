@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from pathlib import Path
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import logging
@@ -106,8 +107,10 @@ def upload_government_data_to_supabase():
 
     # Read the consolidated data
     logger.info("Reading consolidated data...")
-    df = pd.read_csv('consolidated_data.csv')
-    logger.info(f"Loaded {len(df)} records from consolidated_data.csv")
+    project_root = Path(__file__).parent.parent
+    data_file = project_root / 'data' / 'processed' / 'consolidated_data.csv'
+    df = pd.read_csv(data_file)
+    logger.info(f"Loaded {len(df)} records from {data_file}")
 
     # Normalize column names
     logger.info("Normalizing column names...")

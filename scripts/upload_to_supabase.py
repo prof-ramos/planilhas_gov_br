@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from pathlib import Path
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import logging
@@ -16,9 +17,14 @@ def upload_consolidated_data_to_supabase():
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
     supabase: Client = create_client(url, key)
-    
+
+    # Get project root and data files
+    project_root = Path(__file__).parent.parent
+    csv_file = project_root / 'data' / 'processed' / 'consolidated_data.csv'
+    json_file = project_root / 'data' / 'processed' / 'consolidated_data.json'
+
     # Read the consolidated data
-    df = pd.read_csv('consolidated_data.csv')
+    df = pd.read_csv(csv_file)
     
     # Clean and normalize data before upload (following best practices)
     # Replace NaN values with None (which becomes NULL in the database)
@@ -40,9 +46,9 @@ def upload_consolidated_data_to_supabase():
             logger.info(f"Uploaded batch starting at row {i}, total uploaded: {total_uploaded}")
         
         logger.info(f"Successfully uploaded all {total_uploaded} records to Supabase")
-        
+
         # Also upload to a separate table for JSON format if needed
-        df_json = pd.read_json('consolidated_data.json')
+        df_json = pd.read_json(json_file)
         df_json = df_json.where(pd.notnull(df_json), None)
         
         for i in range(0, len(df_json), batch_size):

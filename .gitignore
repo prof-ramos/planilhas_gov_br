@@ -44,11 +44,9 @@ Thumbs.db
 *.xls
 *.xlsx
 
-# Output directories
-converted_csvs/
-consolidated_data.csv
-consolidated_data.json
-error_log.txt
+# Data directories
+data/raw/
+data/processed/
 
 # Environment files
 .env

@@ -29,7 +29,8 @@ def apply_migration(migration_file=None):
         return False
 
     # Get migration files
-    migrations_dir = Path('migrations')
+    project_root = Path(__file__).parent.parent
+    migrations_dir = project_root / 'migrations'
     if migration_file:
         migration_files = [migrations_dir / migration_file]
     else:
@@ -52,6 +53,9 @@ def apply_migration(migration_file=None):
     logger.info(f"Applying {len(migration_files)} migration(s)...")
 
     try:
+        # Create Supabase client
+        supabase: Client = create_client(url, key)
+
         # Execute the migration SQL using the PostgREST SQL endpoint
         # Note: We need to use the raw SQL execution via RPC
         result = supabase.rpc('exec_sql', {'sql': migration_sql}).execute()
