@@ -1,0 +1,14 @@
+[project]
+name = "planilhas_gov_br"
+version = "0.1.0"
+description = "Project for processing Brazilian government data spreadsheets"
+authors = [{name = "Gabriel Ramos", email = "gabrielramos@example.com"}]
+dependencies = [
+    "supabase>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "pandas>=2.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
