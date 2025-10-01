@@ -173,19 +173,21 @@ def process_spreadsheets(directory_path):
     """
     Process all Excel files in the given directory, convert each to CSV,
     and create consolidated CSV and JSON files.
-    
+
     Args:
         directory_path (str): Path to directory containing Excel files
     """
-    # Define directory path
-    dir_path = Path(directory_path)
-    
-    # Find all Excel files in the directory
-    excel_files = list(dir_path.glob('*.xls')) + list(dir_path.glob('*.xlsx'))
-    
+    # Define directory path (project root)
+    project_root = Path(directory_path)
+
+    # Find all Excel files in data/raw directory
+    raw_data_dir = project_root / 'data' / 'raw'
+    excel_files = list(raw_data_dir.glob('*.xls')) + list(raw_data_dir.glob('*.xlsx'))
+
     # Create output directory for individual CSVs
-    output_dir = dir_path / 'converted_csvs'
-    output_dir.mkdir(exist_ok=True)
+    processed_dir = project_root / 'data' / 'processed'
+    output_dir = processed_dir / 'converted_csvs'
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     # List to store all dataframes for consolidation
     dataframes = []
@@ -272,20 +274,20 @@ def process_spreadsheets(directory_path):
         
         # Combine all dataframes, aligning columns
         combined_df = pd.concat(dataframes, ignore_index=True, sort=False, join='outer')
-        
+
         # Save consolidated CSV
-        consolidated_csv_path = dir_path / 'consolidated_data.csv'
+        consolidated_csv_path = processed_dir / 'consolidated_data.csv'
         combined_df.to_csv(consolidated_csv_path, index=False, encoding='utf-8')
         print(f"Consolidated CSV saved: {consolidated_csv_path}")
-        
+
         # Save consolidated JSON
-        consolidated_json_path = dir_path / 'consolidated_data.json'
+        consolidated_json_path = processed_dir / 'consolidated_data.json'
         combined_df.to_json(consolidated_json_path, orient='records', date_format='iso', indent=2, force_ascii=False)
         print(f"Consolidated JSON saved: {consolidated_json_path}")
-    
+
     # Log error for corrupted files
     if error_log:
-        error_log_path = dir_path / 'error_log.txt'
+        error_log_path = processed_dir / 'error_log.txt'
         with open(error_log_path, 'w', encoding='utf-8') as f:
             f.write("Error Log for Corrupted Files:\n")
             f.write("="*40 + "\n")
@@ -299,5 +301,6 @@ def process_spreadsheets(directory_path):
 
 # Run the function on the current directory
 if __name__ == "__main__":
-    directory_to_process = "/Users/gabrielramos/Downloads/planilhas_gov_br"
-    process_spreadsheets(directory_to_process)
+    # Get project root (parent of scripts directory)
+    project_root = Path(__file__).parent.parent
+    process_spreadsheets(project_root)
